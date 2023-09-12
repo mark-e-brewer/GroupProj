@@ -7,5 +7,6 @@
         public int AdminOneId { get; set; }
         public int AdminTwoId { get; set; }
         public int ModifiedUserId { get; set; }
+        public List<RareUsers> RareUsers { get; set; }
     }
 }

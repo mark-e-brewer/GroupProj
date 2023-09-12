@@ -11,6 +11,7 @@
         public DateTime CreatedOn { get; set; }
         public Boolean? Active { get; set; }
         public Boolean? IsStaff { get; set; }
-        public string UID { get; set; } = string.Empty;
+        public string? UID { get; set; }
+        public ICollection<Reaction> Reactions { get; set; }
     }
 }
