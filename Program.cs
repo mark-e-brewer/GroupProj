@@ -32,6 +32,66 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//all posts crud
+//create posts
+app.MapPost("/api/posts", async (RareUsersDbContext db, Posts post) =>
+{
+    db.Posts.Add(post);
+    await db.SaveChangesAsync();
+    return Results.Created($"/api/posts/{post.Id}", post);
+});
+
+//read posts
+app.MapGet("/api/posts", (RareUsersDbContext db) =>
+{
+    var posts = db.Posts.ToList();
+    return Results.Ok(posts);
+});
+
+//update posts
+app.MapPut("/api/posts/{id}", async (RareUsersDbContext db, int id, Posts post) =>
+{
+    if (id != post.Id)
+    {
+        return Results.BadRequest();
+    }
+
+    db.Entry(post).State = EntityState.Modified;
+
+    try
+    {
+        await db.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        if (!db.Posts.Any(s => s.Id == id))
+        {
+            return Results.NotFound();
+        }
+        else
+        {
+            throw;
+        }
+    }
+
+    return Results.NoContent();
+});
+
+//delete posts
+app.MapDelete("/api/posts/{id}", async (RareUsersDbContext db, int id) =>
+{
+    var post = await db.Posts.FindAsync(id);
+    if (post == null)
+    {
+        return Results.NotFound();
+    }
+
+    db.Posts.Remove(post);
+    await db.SaveChangesAsync();
+
+    return Results.NoContent();
+});
+
 app.Run();
 
 
