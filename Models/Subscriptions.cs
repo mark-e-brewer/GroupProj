@@ -7,5 +7,6 @@
         public int AuthorId { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime EndedOn { get; set;}
+        public ICollection<RareUsers> RareUsers { get; set; }
     }
 }
