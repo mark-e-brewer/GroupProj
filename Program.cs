@@ -32,6 +32,41 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapGet("/users", (RareUsersDbContext db) =>
+{
+    return db.Users.ToList();
+});
+
+app.MapGet("/user/{id}", (RareUsersDbContext db, int id) =>
+{
+    var user = db.Users.Where(u => u.Id == id);
+    return user;
+});
+
+app.MapGet("/comments", (RareUsersDbContext db) =>
+{
+    return db.Comments.ToList();
+});
+
+app.MapPost("/comment", (RareUsersDbContext db, Comments comment) =>
+{
+        comment.CreatedOn = DateTime.Now;
+
+        db.Comments.Add(comment);
+        db.SaveChanges();
+        return Results.Ok(comment);
+});
+
+app.MapPut("/comment/{id}", (RareUsersDbContext db, int id, Comments comment) =>
+{
+    Comments commentToUpdate = db.Comments.FirstOrDefault(c => c.Id == id);
+    if (commentToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    commentToUpdate.Content = comment.Content;
+    db.SaveChanges();
+    return Results.Ok(comment);
+});
+
 app.Run();
-
-
