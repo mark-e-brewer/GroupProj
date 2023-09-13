@@ -123,6 +123,12 @@ namespace GroupProj
             {
                 new Categories { Id = 1, Label = "Comedy"}
             });
+
+            var PostsReaction = modelBuilder.Entity("PostsReaction");
+            PostsReaction.HasData(new[]
+            {
+                new {Id=1, PostsId= 1, ReactionsId= 1, RareUsersId=1 }
+            });
         }
     }
 }

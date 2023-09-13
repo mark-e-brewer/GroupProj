@@ -17,7 +17,7 @@ namespace GroupProj.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("ProductVersion", "7.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -78,7 +78,7 @@ namespace GroupProj.Migrations
                         {
                             Id = 1,
                             Content = "this is content",
-                            CreatedOn = new DateTime(2023, 9, 11, 19, 52, 11, 541, DateTimeKind.Local).AddTicks(9401),
+                            CreatedOn = new DateTime(2023, 9, 12, 19, 39, 53, 893, DateTimeKind.Local).AddTicks(3939),
                             PostsId = 1,
                             RareUsersId = 1
                         });
@@ -129,7 +129,7 @@ namespace GroupProj.Migrations
                             CategoriesId = 1,
                             Content = "Blah Blah Blah",
                             ImageURL = "Post Image Url",
-                            PublicationDate = new DateTime(2023, 9, 11, 19, 52, 11, 541, DateTimeKind.Local).AddTicks(9509),
+                            PublicationDate = new DateTime(2023, 9, 12, 19, 39, 53, 893, DateTimeKind.Local).AddTicks(4103),
                             RareUsersId = 1
                         });
                 });
@@ -189,7 +189,7 @@ namespace GroupProj.Migrations
                             Id = 1,
                             Active = true,
                             Bio = "This a bio",
-                            CreatedOn = new DateTime(2023, 9, 11, 19, 52, 11, 541, DateTimeKind.Local).AddTicks(9126),
+                            CreatedOn = new DateTime(2023, 9, 12, 19, 39, 53, 893, DateTimeKind.Local).AddTicks(3647),
                             Email = "this@email.com",
                             FirstName = "Bob",
                             IsStaff = true,
@@ -202,7 +202,7 @@ namespace GroupProj.Migrations
                             Id = 2,
                             Active = true,
                             Bio = "This a bio",
-                            CreatedOn = new DateTime(2023, 9, 11, 19, 52, 11, 541, DateTimeKind.Local).AddTicks(9204),
+                            CreatedOn = new DateTime(2023, 9, 12, 19, 39, 53, 893, DateTimeKind.Local).AddTicks(3701),
                             Email = "this@email.com",
                             FirstName = "Sandra",
                             IsStaff = true,
@@ -215,7 +215,7 @@ namespace GroupProj.Migrations
                             Id = 3,
                             Active = true,
                             Bio = "This a bio",
-                            CreatedOn = new DateTime(2023, 9, 11, 19, 52, 11, 541, DateTimeKind.Local).AddTicks(9206),
+                            CreatedOn = new DateTime(2023, 9, 12, 19, 39, 53, 893, DateTimeKind.Local).AddTicks(3708),
                             Email = "this@email.com",
                             FirstName = "Tim",
                             IsStaff = false,
@@ -287,8 +287,8 @@ namespace GroupProj.Migrations
                         {
                             Id = 1,
                             AuthorId = 1,
-                            CreatedOn = new DateTime(2023, 9, 11, 19, 52, 11, 541, DateTimeKind.Local).AddTicks(9448),
-                            EndedOn = new DateTime(2023, 9, 11, 19, 52, 11, 541, DateTimeKind.Local).AddTicks(9451),
+                            CreatedOn = new DateTime(2023, 9, 12, 19, 39, 53, 893, DateTimeKind.Local).AddTicks(4016),
+                            EndedOn = new DateTime(2023, 9, 12, 19, 39, 53, 893, DateTimeKind.Local).AddTicks(4021),
                             FollowerId = 2
                         });
                 });
@@ -364,6 +364,13 @@ namespace GroupProj.Migrations
                     b.HasIndex("ReactionsId");
 
                     b.ToTable("PostsReaction");
+
+                    b.HasData(
+                        new
+                        {
+                            PostsId = 1,
+                            ReactionsId = 1
+                        });
                 });
 
             modelBuilder.Entity("PostsTags", b =>
