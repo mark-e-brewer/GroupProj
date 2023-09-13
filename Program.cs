@@ -94,6 +94,44 @@ app.MapGet("/api/posts/categories/{id}", (RareUsersDbContext db, int id) =>
 app.UseHttpsRedirection();
 
 
+app.MapGet("/users", (RareUsersDbContext db) =>
+{
+    return db.Users.ToList();
+});
+
+app.MapGet("/user/{id}", (RareUsersDbContext db, int id) =>
+{
+    var user = db.Users.Where(u => u.Id == id);
+    return user;
+});
+
+app.MapGet("/comments", (RareUsersDbContext db) =>
+{
+    return db.Comments.ToList();
+});
+
+app.MapPost("/comment", (RareUsersDbContext db, Comments comment) =>
+{
+        comment.CreatedOn = DateTime.Now;
+
+        db.Comments.Add(comment);
+        db.SaveChanges();
+        return Results.Ok(comment);
+});
+
+app.MapPut("/comment/{id}", (RareUsersDbContext db, int id, Comments comment) =>
+{
+    Comments commentToUpdate = db.Comments.FirstOrDefault(c => c.Id == id);
+    if (commentToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    commentToUpdate.Content = comment.Content;
+    db.SaveChanges();
+    return Results.Ok(comment);
+});
+
+
 // TAG ENDPOINTS
 // View All Tags
 app.MapGet("api/Tags", (RareUsersDbContext db) =>
@@ -176,7 +214,7 @@ app.MapDelete("api/tags/{id}", (RareUsersDbContext db, int id) =>
     db.Tags.Remove(tagToDelete);
     db.SaveChanges();
     return Results.NoContent();
-=======
+
 
 //Registe a new user Issue #47
 app.MapPost("/newUser", (RareUsersDbContext db, RareUsers user) =>
@@ -213,6 +251,52 @@ app.MapGet("/subscribersCount", (RareUsersDbContext db, int authorId) =>
 
 });
 
+
+
+
+app.MapDelete("/comment/{id}", (RareUsersDbContext db, int id) =>
+{
+    Comments commentToDelete = db.Comments.FirstOrDefault(c => c.Id == id);
+    if (commentToDelete == null)
+    {
+        return Results.NotFound(id);
+    }
+    db.Comments.Remove(commentToDelete);
+    db.SaveChanges();
+    return Results.NoContent();
+});
+
+app.MapGet("/postcomments/{id}", (RareUsersDbContext db, int id) =>
+{
+    var postToGetComments = db.Posts.Where(c => c.Id == id).Include(c => c.Comments).ToList();
+    return postToGetComments;
+    
+});
+
+app.MapGet("/subs", (RareUsersDbContext db) =>
+{
+    return db.Subscriptions.ToList();
+});
+
+app.MapPost("/subscribe", (RareUsersDbContext db, Subscriptions sub) => 
+{
+    sub.CreatedOn = DateTime.Now;
+
+    db.Subscriptions.Add(sub);
+    db.SaveChanges();
+    return Results.Ok(sub);
+});
+
+app.MapPut("/unsubscribe/{id}", (RareUsersDbContext db, int id, Subscriptions sub) => 
+{
+    Subscriptions unsubTo = db.Subscriptions.FirstOrDefault(s => s.Id == id);
+    if (unsubTo ==  null)
+    {
+        return Results.NotFound();
+    }
+    unsubTo.EndedOn = DateTime.Now;
+    db.SaveChanges();
+    return Results.Ok(unsubTo);
+});
+
 app.Run();
-
-
