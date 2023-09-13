@@ -34,6 +34,90 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 
+// TAG ENDPOINTS
+// View All Tags
+app.MapGet("api/Tags", (RareUsersDbContext db) =>
+{
+    return db.Tags;
+});
+// Add A Tag to a Post
+app.MapPost("api/posts/{postId}/tags/{tagId}", (RareUsersDbContext db, int postId, int tagId) =>
+{
+    var post = db.Posts
+        .Include(p => p.Tags)
+        .FirstOrDefault(p => p.Id == postId);
+
+    if (post == null)
+    {
+        return Results.NotFound("Post not found");
+    }
+
+    var tag = db.Tags.Find(tagId);
+
+    if (tag == null)
+    {
+        return Results.NotFound("Tag not found");
+    }
+
+    post.Tags.Add(tag);
+    db.SaveChanges();
+    return Results.Ok(post);
+});
+// Remove A Tag From A Post
+app.MapDelete("api/posts/{postId}/tags/{tagId}", (RareUsersDbContext db, int postId, int tagId) =>
+{
+    var post = db.Posts
+       .Include(p => p.Tags)
+       .FirstOrDefault(p => p.Id == postId);
+
+    if (post == null)
+    {
+        return Results.NotFound("Post not found");
+    }
+
+    var tag = db.Tags.Find(tagId);
+
+    if (tag == null)
+    {
+        return Results.NotFound("Tag not found");
+    }
+
+    post.Tags.Remove(tag);
+    db.SaveChanges();
+    return Results.Ok(post);
+});
+// Create A Tag
+app.MapPost("api/tags", (RareUsersDbContext db, Tags Tag) =>
+{
+    db.Tags.Add(Tag);
+    db.SaveChanges();
+    return Results.Created($"api/tags{Tag.Id}", Tag);
+});
+// Update A Tag
+app.MapPut("api/tags/{id}", async (RareUsersDbContext db, int id, Tags Tag) =>
+{
+    Tags tagToUpdate = await db.Tags.SingleOrDefaultAsync(t => t.Id == id);
+    if (tagToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    tagToUpdate.Label = Tag.Label;
+    db.SaveChanges();
+    return Results.NoContent();
+});
+// Delete A Tag
+app.MapDelete("api/tags/{id}", (RareUsersDbContext db, int id) =>
+{
+    Tags tagToDelete = db.Tags.SingleOrDefault(t => t.Id == id);
+    if (tagToDelete == null)
+    {
+        return Results.NotFound();
+    }
+    db.Tags.Remove(tagToDelete);
+    db.SaveChanges();
+    return Results.NoContent();
+=======
+
 //Registe a new user Issue #47
 app.MapPost("/newUser", (RareUsersDbContext db, RareUsers user) =>
 {
@@ -66,6 +150,7 @@ app.MapGet("/subscribersCount", (RareUsersDbContext db, int authorId) =>
 {
     var subCount= db.Subscriptions.Where(s => s.AuthorId == authorId).Count();
     return subCount;
+
 });
 
 app.Run();
