@@ -34,4 +34,4 @@ app.UseHttpsRedirection();
 
 app.Run();
 
-
+//this is becuase im a dumbass
