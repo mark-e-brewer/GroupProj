@@ -208,11 +208,12 @@ namespace GroupProj.Migrations
                 columns: table => new
                 {
                     PostsId = table.Column<int>(type: "integer", nullable: false),
-                    ReactionsId = table.Column<int>(type: "integer", nullable: false)
+                    ReactionsId = table.Column<int>(type: "integer", nullable: false),
+                    RareUsersId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PostsReaction", x => new { x.PostsId, x.ReactionsId });
+                    table.PrimaryKey("PK_PostsReaction", x => new { x.PostsId, x.ReactionsId, x.RareUsersId });
                     table.ForeignKey(
                         name: "FK_PostsReaction_Posts_PostsId",
                         column: x => x.PostsId,
@@ -225,7 +226,13 @@ namespace GroupProj.Migrations
                         principalTable: "Reactions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                    table.ForeignKey(
+                        name: "FK_PostsReaction_RareUsers_RareUsersId",
+                        column: x => x.RareUsersId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                }); ;
 
             migrationBuilder.InsertData(
                 table: "Categories",
