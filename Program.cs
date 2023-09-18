@@ -24,7 +24,22 @@ builder.Services.Configure<JsonOptions>(options =>
 {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000",
+                                "http://localhost:5169")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+//Add for Cors 
+app.UseCors();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -213,7 +228,7 @@ app.MapDelete("api/tags/{id}", (RareUsersDbContext db, int id) =>
     db.Tags.Remove(tagToDelete);
     db.SaveChanges();
     return Results.NoContent();
-
+});
 
 //Registe a new user Issue #47
 app.MapPost("/newUser", (RareUsersDbContext db, RareUsers user) =>
@@ -356,6 +371,20 @@ app.MapDelete("/api/posts/{id}", async (RareUsersDbContext db, int id) =>
     await db.SaveChangesAsync();
 
     return Results.NoContent();
+});
+
+
+app.MapGet("/checkuser/{uid}", (RareUsersDbContext db, string uid) =>
+{
+    var user = db.Users.Where(x => x.UID == uid).ToList();
+    if (uid == null)
+    {
+        return Results.NotFound();
+    }
+    else
+    {
+        return Results.Ok(user);
+    }
 });
 
 app.Run();
