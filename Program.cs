@@ -3,9 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using GroupProj;
-using System.Runtime.CompilerServices;
-using System.Net;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +21,23 @@ builder.Services.Configure<JsonOptions>(options =>
 {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000",
+                                "http://localhost:5169")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+//Add for Cors 
+app.UseCors();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -32,64 +45,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.MapGet("/api/Categories", (RareUsersDbContext db) =>
-{
-    return db.Categories.ToList();
-});
-
-app.MapGet("/api/Categories/{id}", (RareUsersDbContext db, int id) =>
-{
-    return db.Categories.FirstOrDefault(c => c.Id == id);
-});
-
-app.MapPost("/api/Categories", (RareUsersDbContext db, Categories category) =>
-{
-    db.Categories.Add(category);
-    db.SaveChanges();
-    return Results.Ok();
-});
-
-app.MapDelete("/api/categories/{id}", (RareUsersDbContext db, int id) =>
-{
-    Categories categories = db.Categories.SingleOrDefault(categories => categories.Id == id);
-    if (categories == null)
-    {
-        return Results.NotFound();
-    }
-    db.Categories.Remove(categories);
-    db.SaveChanges();
-    return Results.NoContent();
-
-});
-
-app.MapPut("/api/categories/{id}", (RareUsersDbContext db, int id, Categories categories) =>
-{
-    Categories categoriesToUpdate = db.Categories.SingleOrDefault(c => c.Id == id);
-    if (categoriesToUpdate == null)
-    {
-        return Results.NotFound();
-    }
-    categoriesToUpdate.Label = categories.Label;
-    db.SaveChanges();
-    return Results.NoContent();
-});
-
-app.MapGet("/api/posts/categories/{id}", (RareUsersDbContext db, int id) =>
-{
-    var posts = db.Posts.Where(p => p.CategoriesId == id).Include(x => x.Categories).ToList();
-    
-    if (posts == null || posts.Count == 0)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.Ok(posts);
-});
-
-
-
-
 
 app.UseHttpsRedirection();
 
@@ -358,4 +313,19 @@ app.MapDelete("/api/posts/{id}", async (RareUsersDbContext db, int id) =>
     return Results.NoContent();
 });
 
+app.MapGet("/checkuser/{uid}", (RareUsersDbContext db, string uid) =>
+{
+    var user = db.Users.Where(x => x.UID == uid).ToList();
+    if (uid == null)
+    {
+        return Results.NotFound();
+    }
+    else
+    {
+        return Results.Ok(user);
+    }
+});
+
 app.Run();
+
+
