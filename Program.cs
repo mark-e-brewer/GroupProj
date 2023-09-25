@@ -124,15 +124,31 @@ app.MapGet("/comments", (RareUsersDbContext db) =>
     return db.Comments.ToList();
 });
 
-app.MapPost("/comment", (RareUsersDbContext db, Comments comment) =>
+//GET a single comment by PK
+app.MapGet("/comment/{id}", (RareUsersDbContext db, int id) =>
 {
-        comment.CreatedOn = DateTime.Now;
-
-        db.Comments.Add(comment);
-        db.SaveChanges();
-        return Results.Ok(comment);
+    return db.Comments.FirstOrDefault(c => c.Id == id);
 });
 
+//POST a Comment to a Post
+app.MapPost("/post/comments/{postId}", (RareUsersDbContext db, int postId, Comments comment) =>
+{
+    // Ensure the post exists
+    var post = db.Posts.FirstOrDefault(p => p.Id == postId);
+    if (post == null)
+    {
+        return Results.NotFound();
+    }
+
+    comment.CreatedOn = DateTime.Now;
+    comment.PostsId = postId;
+
+    db.Comments.Add(comment);
+    db.SaveChanges();
+    return Results.Ok(comment);
+});
+
+//UPDATE a comment
 app.MapPut("/comment/{id}", (RareUsersDbContext db, int id, Comments comment) =>
 {
     Comments commentToUpdate = db.Comments.FirstOrDefault(c => c.Id == id);
@@ -143,6 +159,50 @@ app.MapPut("/comment/{id}", (RareUsersDbContext db, int id, Comments comment) =>
     commentToUpdate.Content = comment.Content;
     db.SaveChanges();
     return Results.Ok(comment);
+});
+
+//GET a Posts Comments (DTO return format)
+app.MapGet("/post/comments/{postId}", (RareUsersDbContext db, int postId) =>
+{
+    var postWithComments = db.Posts
+        .Where(p => p.Id == postId)
+        .Select(p => new PostWithCommentsDTO
+        {
+            Id = p.Id,
+            Title = p.Title,
+            Content = p.Content,
+            ImageURL = p.ImageURL,
+            Comments = p.Comments.Select(c => new CommentDTO
+            {
+                Id = c.Id,
+                RareUsersId = c.RareUsersId,
+                PostsId = c.PostsId,
+                Content = c.Content,
+                CreatedOn = c.CreatedOn
+            }).ToList()
+        })
+        .FirstOrDefault();
+
+    if (postWithComments == null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(postWithComments);
+});
+
+//DELETE comment by PK
+app.MapDelete("/comment/{id}", (RareUsersDbContext db, int id) => 
+{
+    var commentToDelete = db.Comments.FirstOrDefault(c => c.Id  == id);
+    if (commentToDelete == null)
+    {
+        return Results.NotFound();  
+    }
+
+    db.Comments.Remove(commentToDelete);
+    db.SaveChanges();
+    return Results.NoContent();
 });
 
 
