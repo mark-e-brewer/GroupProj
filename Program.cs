@@ -326,20 +326,6 @@ app.MapGet("/subscribersCount", (RareUsersDbContext db, int authorId) =>
 });
 
 
-
-
-app.MapDelete("/comment/{id}", (RareUsersDbContext db, int id) =>
-{
-    Comments commentToDelete = db.Comments.FirstOrDefault(c => c.Id == id);
-    if (commentToDelete == null)
-    {
-        return Results.NotFound(id);
-    }
-    db.Comments.Remove(commentToDelete);
-    db.SaveChanges();
-    return Results.NoContent();
-});
-
 app.MapGet("/postcomments/{id}", (RareUsersDbContext db, int id) =>
 {
     var postToGetComments = db.Posts.Where(c => c.Id == id).Include(c => c.Comments).ToList();
